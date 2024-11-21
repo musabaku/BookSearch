@@ -1,0 +1,8 @@
+@BookSearch_HostAddress = http://localhost:7192
+
+GET {{BookSearch_HostAddress}}/api/BookSearch/search?query=food
+Accept: application/json
+
+
+
+###
