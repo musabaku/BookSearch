@@ -57,8 +57,6 @@ namespace BookSearch.Model
         [JsonPropertyName("title")]
         public string Title { get; set; }
 
-        [JsonPropertyName("subtitle")]
-        public string? Subtitle { get; set; }
 
         [JsonPropertyName("authors")]
         public List<string>? Authors { get; set; }
