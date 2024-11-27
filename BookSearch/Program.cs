@@ -1,4 +1,6 @@
+using BookSearch.Data;
 using BookSearch.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookSearch
 {
@@ -18,9 +20,16 @@ namespace BookSearch
                           .AllowAnyHeader();         // Allow any headers
                 });
             });
+            builder.Services.AddDbContext<AuthDbContext>(options =>
+               options.UseSqlServer(
+                   builder.Configuration.GetConnectionString("DefaultConnection")
+               ));
+
+
 
             // Add services to the container.
             builder.Services.AddScoped<IBookServices, BookServices>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddLogging(config =>
             {
                 config.AddConsole();

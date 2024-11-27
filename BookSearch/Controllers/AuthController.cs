@@ -26,5 +26,29 @@ namespace BookSearch.Controllers
             return result? Ok("User created"): Ok("User alerady exists, login!");
 
         }
+        [HttpPost("login")]
+        public async Task<ActionResult> LoginController([FromBody] Login request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password))
+                {
+                    return BadRequest("Invalid username or password");
+                }
+                var token = await _authService.LoginUser(request.UserName, request.Password);
+                return Ok(token);
+
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+           
+
+        }
     }
 }
