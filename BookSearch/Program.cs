@@ -20,16 +20,19 @@ namespace BookSearch
                           .AllowAnyHeader();         // Allow any headers
                 });
             });
-            builder.Services.AddDbContext<AuthDbContext>(options =>
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
                options.UseSqlServer(
                    builder.Configuration.GetConnectionString("DefaultConnection")
                ));
+           
+
 
 
 
             // Add services to the container.
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IFavouriteService, FavouriteService>();
             builder.Services.AddLogging(config =>
             {
                 config.AddConsole();

@@ -11,8 +11,8 @@ namespace BookSearch.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly AuthDbContext _dbContext;
-        public AuthService(AuthDbContext dbContext)
+        private readonly ApplicationDbContext _dbContext;
+        public AuthService(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
