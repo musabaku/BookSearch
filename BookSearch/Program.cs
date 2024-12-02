@@ -1,6 +1,9 @@
 using BookSearch.Data;
 using BookSearch.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace BookSearch
 {
@@ -20,14 +23,11 @@ namespace BookSearch
                           .AllowAnyHeader();         // Allow any headers
                 });
             });
+
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                options.UseSqlServer(
                    builder.Configuration.GetConnectionString("DefaultConnection")
                ));
-           
-
-
-
 
             // Add services to the container.
             builder.Services.AddScoped<IBookServices, BookServices>();
@@ -41,12 +41,58 @@ namespace BookSearch
             builder.Logging.AddConsole();
             builder.Logging.SetMinimumLevel(LogLevel.Information);
 
+            // Add Authentication and JWT Bearer configuration
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        // Validate the token's signature
+                        ValidateIssuerSigningKey = true,
+
+                        // Set the key used to sign the token
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_super_secure_256bit_secret_key_here_12345678")),
+
+                        // Validate the token's expiration
+                        ValidateLifetime = true,
+
+                        // These are optional since you're not using them
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                    };
+                });
+
+            // Configure Swagger/OpenAPI
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                // Add Bearer Token to Swagger
+                options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
+                    Name = "Authorization",
+                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
+                });
+
+                options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+                {
+                    {
+                        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                        {
+                            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                            {
+                                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+            });
 
             builder.Services.AddControllers();
             builder.Services.AddHttpClient();
-            // Configure Swagger/OpenAPI
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
@@ -62,6 +108,9 @@ namespace BookSearch
 
             // Enable HTTPS redirection
             app.UseHttpsRedirection();
+
+            // Enable authentication middleware
+            app.UseAuthentication();
 
             // Enable authorization middleware
             app.UseAuthorization();

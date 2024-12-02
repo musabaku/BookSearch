@@ -49,7 +49,7 @@ namespace BookSearch.Model
         public string Id { get; set; }
 
         [JsonPropertyName("volumeInfo")]
-        public VolumeInfo VolumeInfo { get; set; }
+        public VolumeInfo? VolumeInfo { get; set; }
     }
 
     public class VolumeInfo

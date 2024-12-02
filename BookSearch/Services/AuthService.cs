@@ -50,14 +50,15 @@ namespace BookSearch.Services
                 throw new InvalidOperationException("Password dont match, Incorrect password");
 
             }
-            var token = GenerateJWTToken(userRetrieve.UserName);
+            var token = GenerateJWTToken(userRetrieve.UserId);
             return token;
         }
-        public String GenerateJWTToken(String UserName)
+        public String GenerateJWTToken(int UserId)
         {
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub,UserName)
+                //new Claim(JwtRegisteredClaimNames.Sub,UserName)
+                new Claim(JwtRegisteredClaimNames.Sub, UserId.ToString()),
             };
             var secretKey = "your_super_secure_256bit_secret_key_here_12345678"; // 32 characters
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));

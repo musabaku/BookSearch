@@ -6,7 +6,7 @@ public class FavouriteModel
     [Key]
     public string FavouriteId { get; set; }
     public int UserId { get; set; }
-    public string BookId { get; set; }
+    public int BookId { get; set; }
 
     // Navigation property for easier queries (optional)
     public User User { get; set; }
