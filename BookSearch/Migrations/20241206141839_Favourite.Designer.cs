@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookSearch.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241202102927_FixBookIdAutoIncrement")]
-    partial class FixBookIdAutoIncrement
+    [Migration("20241206141839_Favourite")]
+    partial class Favourite
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -19,20 +19,6 @@ namespace BookSearch.Data
         public DbSet<FavouriteModel> Favorites { get; set; }
 
         // Configure the BookId as an auto-incrementing primary key using Fluent API
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-            // Configure BookStorageModel
-            modelBuilder.Entity<BookStorageModel>(entity =>
-            {
-                entity.HasKey(e => e.BookId);  // Set BookId as primary key
-                entity.Property(e => e.BookId)  // Make BookId auto-increment
-                      .ValueGeneratedOnAdd()  // Auto-increment on insert
-                      .IsRequired();  // Mark it as required (not nullable)
-            });
-
-            // Additional configurations for other models can go here
-        }
+       
     }
 }

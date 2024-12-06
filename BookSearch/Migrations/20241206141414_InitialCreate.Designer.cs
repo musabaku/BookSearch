@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookSearch.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241202095607_MakeBookIdAutoIncrement")]
-    partial class MakeBookIdAutoIncrement
+    [Migration("20241206141414_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -129,9 +129,8 @@ namespace BookSearch.Migrations
                     b.Property<string>("FavouriteId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("BookId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");

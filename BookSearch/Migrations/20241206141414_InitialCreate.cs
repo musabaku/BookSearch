@@ -5,7 +5,7 @@
 namespace BookSearch.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,7 +14,8 @@ namespace BookSearch.Migrations
                 name: "Books",
                 columns: table => new
                 {
-                    BookId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    BookId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     GoogleBookId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Authors = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -75,7 +76,7 @@ namespace BookSearch.Migrations
                 {
                     FavouriteId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    BookId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    BookId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
