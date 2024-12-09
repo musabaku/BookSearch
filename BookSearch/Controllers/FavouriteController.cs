@@ -74,5 +74,12 @@ namespace BookSearch.Controllers
             _logger.LogInformation("Successfully added favourite.");
             return Ok(response);
         }
+        [HttpGet("favourites/allfavourite")]
+        public async Task<IActionResult> GetFavourite()
+        {
+            const response = _favouriteService.GetFavourite();
+          }
     }
+   
+
 }

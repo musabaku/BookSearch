@@ -1,6 +1,7 @@
 ﻿using BookSearch.Data;
 using BookSearch.Model;
 using BookSearch.Utility;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using System.Text.Json;
@@ -100,6 +101,10 @@ namespace BookSearch.Services
             return new ResponseResult(true, "This book is added to your favourites");
 
 
+
+        }
+        public async Task<IActionResult> GetFavourite()
+        {
 
         }
     }
