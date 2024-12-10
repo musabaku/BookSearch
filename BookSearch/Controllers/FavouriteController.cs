@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Logging;
+using BookSearch.Model;
+using Azure;
 
 namespace BookSearch.Controllers
 {
@@ -75,11 +77,74 @@ namespace BookSearch.Controllers
             return Ok(response);
         }
         [HttpGet("favourites/allfavourite")]
-        public async Task<IActionResult> GetFavourite()
+        public async Task<ActionResult<IEnumerable<Book>>> GetFavourite()
         {
-            const response = _favouriteService.GetFavourite();
+            if (!User.Identity.IsAuthenticated) {
+                return BadRequest(Unauthorized("User is not authenticated"));
+            }
+           var UserIdString = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+            if (string.IsNullOrEmpty(UserIdString))
+            {
+                return BadRequest("User not found, Please login");
+            }
+
+            if (!int.TryParse(UserIdString, out var UserId)) {
+                return BadRequest(Unauthorized("User is not authenticated"));
+            }
+
+            var response = await _favouriteService.GetFavourite(UserId);
+            return Ok(response);
           }
+
+        [HttpDelete("favourites/deletefavourite/{GoogleBookId}")]
+        public async Task<IActionResult> DeleteFavourite([FromRoute] string GoogleBookId)
+        {
+            _logger.LogInformation("DeleteFavourite called with GoogleBookId: {GoogleBookId}", GoogleBookId);
+
+            // Check if the user is authenticated
+            if (!User.Identity.IsAuthenticated)
+            {
+                _logger.LogWarning("User is not authenticated.");
+                return BadRequest(Unauthorized("User not authenticated"));
+            }
+
+            // Validate the GoogleBookId
+            if (string.IsNullOrEmpty(GoogleBookId))
+            {
+                _logger.LogWarning("Invalid or empty GoogleBookId provided.");
+                return BadRequest("Book Id format is invalid.");
+            }
+
+            // Extract User ID from claims
+            var UserIdString = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+            if (string.IsNullOrEmpty(UserIdString))
+            {
+                _logger.LogWarning("User ID is null or empty. User may not be logged in.");
+                return BadRequest("User not found. Please log in.");
+            }
+
+            // Parse User ID to integer
+            if (!int.TryParse(UserIdString, out var UserId))
+            {
+                _logger.LogWarning("Failed to parse User ID: {UserIdString}", UserIdString);
+                return BadRequest("Could not parse User ID into an integer.");
+            }
+
+            _logger.LogInformation("Attempting to delete favourite for UserId: {UserId}, GoogleBookId: {GoogleBookId}", UserId, GoogleBookId);
+
+            // Call the service to delete the favourite
+            var result = await _favouriteService.DeleteFavourite(GoogleBookId, UserId);
+            if (!result.IsSuccessful)
+            {
+                _logger.LogError("Failed to delete favourite. Error: {ErrorMessage}", result.message);
+                return BadRequest(result.message);
+            }
+
+            _logger.LogInformation("Successfully deleted favourite for UserId: {UserId}, GoogleBookId: {GoogleBookId}", UserId, GoogleBookId);
+            return Ok(new { message = result.message });
+        }
+
     }
-   
+
 
 }

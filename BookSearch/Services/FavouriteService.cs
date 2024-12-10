@@ -103,9 +103,31 @@ namespace BookSearch.Services
 
 
         }
-        public async Task<IActionResult> GetFavourite()
+        public async Task<IEnumerable<BookStorageModel>> GetFavourite(int UserId)
         {
 
+          var favouriteList = await  _dbContext.Favorites.Where(f => f.UserId == UserId).Select(f => f.BookId).ToListAsync();
+
+            var books = await _dbContext.Books.Where(b=> favouriteList.Contains(b.BookId)).ToListAsync();
+
+            return books;
+
+        }
+        public async Task<ResponseResult> DeleteFavourite(string GoogleBookId, int UserId)
+        {
+          var bookIdDelete =  await _dbContext.Books.Where(b => b.GoogleBookId == GoogleBookId).Select(b=>b.BookId).FirstOrDefaultAsync();
+            if (bookIdDelete == 0)
+            {
+                return new ResponseResult(false, "Book not found");
+            }
+            var favouriteDelete = await _dbContext.Favorites.FirstOrDefaultAsync(f => f.BookId == bookIdDelete && f.UserId == UserId);
+            if(favouriteDelete == null)
+            {
+                return new ResponseResult(false, "Favourite record not found");
+            }
+             _dbContext.Remove(favouriteDelete);
+            await _dbContext.SaveChangesAsync();
+            return new ResponseResult(true, "Favourite Deleted Successfully!!");
         }
     }
 }
