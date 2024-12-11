@@ -50,9 +50,6 @@ namespace BookSearch.Controllers
            
 
         }
-        public IActionResult LogOut()
-        {
-            return Ok("Logged Out Successfully!!");
-        }
+       
     }
 }
