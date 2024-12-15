@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Logging;
 using BookSearch.Model;
+using System.Security.Claims;
 
 namespace BookSearch.Controllers
 {
@@ -24,6 +25,11 @@ namespace BookSearch.Controllers
         {
             // Log the incoming request headers for debugging
             _logger.LogInformation("Incoming request headers: {@Headers}", Request.Headers);
+            _logger.LogInformation("Claims from the JWT token:");
+            foreach (var claim in User.Claims)
+            {
+                _logger.LogInformation($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
+            }
 
             // Check if the user is authenticated
             if (!User.Identity.IsAuthenticated)
@@ -78,22 +84,26 @@ namespace BookSearch.Controllers
         [HttpGet("favourites/allfavourite")]
         public async Task<ActionResult<IEnumerable<Book>>> GetFavourite()
         {
-            if (!User.Identity.IsAuthenticated) {
+            if (!User.Identity.IsAuthenticated)
+            {
                 return BadRequest(Unauthorized("User is not authenticated"));
             }
-           var UserIdString = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+            var UserIdString = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
             if (string.IsNullOrEmpty(UserIdString))
             {
                 return BadRequest("User not found, Please login");
             }
 
-            if (!int.TryParse(UserIdString, out var UserId)) {
+            if (!int.TryParse(UserIdString, out var UserId))
+            {
                 return BadRequest(Unauthorized("User is not authenticated"));
             }
 
             var response = await _favouriteService.GetFavourite(UserId);
             return Ok(response);
-          }
+        }
+        
+
 
         [HttpDelete("favourites/deletefavourite/{GoogleBookId}")]
         public async Task<IActionResult> DeleteFavourite([FromRoute] string GoogleBookId)

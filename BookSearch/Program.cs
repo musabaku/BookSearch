@@ -42,26 +42,26 @@
 //            builder.Logging.AddConsole();
 //            builder.Logging.SetMinimumLevel(LogLevel.Information);
 
-//            // Add Authentication and JWT Bearer configuration
-//            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//                .AddJwtBearer(options =>
-//                {
-//                    options.TokenValidationParameters = new TokenValidationParameters
-//                    {
-//                        // Validate the token's signature
-//                        ValidateIssuerSigningKey = true,
+//// Add Authentication and JWT Bearer configuration
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddJwtBearer(options =>
+//    {
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            // Validate the token's signature
+//            ValidateIssuerSigningKey = true,
 
-//                        // Set the key used to sign the token
-//                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_super_secure_256bit_secret_key_here_12345678")),
+//            // Set the key used to sign the token
+//            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_super_secure_256bit_secret_key_here_12345678")),
 
-//                        // Validate the token's expiration
-//                        ValidateLifetime = true,
+//            // Validate the token's expiration
+//            ValidateLifetime = true,
 
-//                        // These are optional since you're not using them
-//                        ValidateIssuer = false,
-//                        ValidateAudience = false,
-//                    };
-//                });
+//            // These are optional since you're not using them
+//            ValidateIssuer = false,
+//            ValidateAudience = false,
+//        };
+//    });
 
 //            // Configure Swagger/OpenAPI
 //            builder.Services.AddEndpointsApiExplorer();
@@ -191,7 +191,8 @@ namespace BookSearch
             builder.Logging.SetMinimumLevel(LogLevel.Information);
 
             // Configure JWT authentication
-            var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "default_fallback_secret_key_12345678";
+            var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "your_super_secure_256bit_secret_key_here_12345678";
+
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -204,6 +205,8 @@ namespace BookSearch
                         ValidateAudience = false,
                     };
                 });
+
+
 
             // Configure Swagger/OpenAPI
             builder.Services.AddEndpointsApiExplorer();
@@ -236,9 +239,10 @@ namespace BookSearch
             builder.Services.AddControllers();
             builder.Services.AddHttpClient();
 
-            // Read the PORT environment variable; fallback to 5000 if not set
+            //// Read the PORT environment variable; fallback to 5000 if not set
             var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
             builder.WebHost.UseUrls($"http://*:{port}");
+
 
             var app = builder.Build();
 
