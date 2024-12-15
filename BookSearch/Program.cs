@@ -140,14 +140,26 @@ namespace BookSearch
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Configure CORS to allow any origin, method, and header
+            // Get the CORS policy based on the environment (development or production)
+            var corsPolicy = builder.Environment.IsDevelopment()
+                ? "AllowAnyOrigin" // In development, allow any origin
+                : "AllowSpecificOrigin"; // In production, allow only specific origin
+
+            // Configure CORS to allow the specific frontend origin
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAllOrigins", policy =>
+                options.AddPolicy("AllowSpecificOrigin", policy =>
                 {
-                    policy.AllowAnyOrigin()          // Allow any origin
-                          .AllowAnyMethod()          // Allow any HTTP method
-                          .AllowAnyHeader();         // Allow any headers
+                    policy.WithOrigins("https://booksearchfe.onrender.com")  // Allow your frontend URL
+                          .AllowAnyMethod()                                  // Allow any HTTP method
+                          .AllowAnyHeader();                                 // Allow any headers
+                });
+
+                options.AddPolicy("AllowAnyOrigin", policy =>
+                {
+                    policy.AllowAnyOrigin()                               // Allow any origin in development
+                          .AllowAnyMethod()                               // Allow any HTTP method
+                          .AllowAnyHeader();                              // Allow any headers
                 });
             });
 
@@ -177,7 +189,7 @@ namespace BookSearch
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 ));
 
-            // Add services to the container.
+            // Add services to the container
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IFavouriteService, FavouriteService>();
@@ -185,11 +197,12 @@ namespace BookSearch
             {
                 config.AddConsole();
             });
+
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
             builder.Logging.SetMinimumLevel(LogLevel.Information);
 
-            // Configure JWT secret from environment variable
+            // Configure JWT authentication
             var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "default_fallback_secret_key_12345678";
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -235,13 +248,11 @@ namespace BookSearch
             builder.Services.AddControllers();
             builder.Services.AddHttpClient();
 
-            //var app = builder.Build();
             // Read the PORT environment variable; fallback to 5000 if not set
             var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
             builder.WebHost.UseUrls($"http://*:{port}");
 
             var app = builder.Build();
-
 
             // Enable Swagger UI in non-production environments
             if (!app.Environment.IsProduction())
@@ -250,8 +261,8 @@ namespace BookSearch
                 app.UseSwaggerUI();
             }
 
-            // Enable CORS middleware
-            app.UseCors("AllowAllOrigins");
+            // Enable CORS middleware based on the environment
+            app.UseCors(corsPolicy); // Use "AllowAnyOrigin" in development, "AllowSpecificOrigin" in production
 
             // Enable HTTPS redirection
             app.UseHttpsRedirection();
@@ -270,3 +281,4 @@ namespace BookSearch
         }
     }
 }
+
