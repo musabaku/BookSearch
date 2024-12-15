@@ -25,7 +25,7 @@ namespace BookSearch
             });
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-               options.UseSqlServer(
+               options.UseNpgsql(
                    builder.Configuration.GetConnectionString("DefaultConnection")
                ));
 

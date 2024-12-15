@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Logging;
 using BookSearch.Model;
-using Azure;
 
 namespace BookSearch.Controllers
 {
