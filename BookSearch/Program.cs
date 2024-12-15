@@ -235,7 +235,13 @@ namespace BookSearch
             builder.Services.AddControllers();
             builder.Services.AddHttpClient();
 
+            //var app = builder.Build();
+            // Read the PORT environment variable; fallback to 5000 if not set
+            var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+            builder.WebHost.UseUrls($"http://*:{port}");
+
             var app = builder.Build();
+
 
             // Enable Swagger UI in non-production environments
             if (!app.Environment.IsProduction())
