@@ -140,26 +140,14 @@ namespace BookSearch
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Get the CORS policy based on the environment (development or production)
-            var corsPolicy = builder.Environment.IsDevelopment()
-                ? "AllowAnyOrigin" // In development, allow any origin
-                : "AllowSpecificOrigin"; // In production, allow only specific origin
-
-            // Configure CORS to allow the specific frontend origin
+            // Configure CORS to allow any origin, method, and header
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowSpecificOrigin", policy =>
-                {
-                    policy.WithOrigins("https://booksearchfe.onrender.com")  // Allow your frontend URL
-                          .AllowAnyMethod()                                  // Allow any HTTP method
-                          .AllowAnyHeader();                                 // Allow any headers
-                });
-
                 options.AddPolicy("AllowAnyOrigin", policy =>
                 {
-                    policy.AllowAnyOrigin()                               // Allow any origin in development
-                          .AllowAnyMethod()                               // Allow any HTTP method
-                          .AllowAnyHeader();                              // Allow any headers
+                    policy.AllowAnyOrigin()        // Allow any origin
+                          .AllowAnyMethod()        // Allow any HTTP method
+                          .AllowAnyHeader();       // Allow any headers
                 });
             });
 
@@ -261,8 +249,8 @@ namespace BookSearch
                 app.UseSwaggerUI();
             }
 
-            // Enable CORS middleware based on the environment
-            app.UseCors(corsPolicy); // Use "AllowAnyOrigin" in development, "AllowSpecificOrigin" in production
+            // Enable CORS middleware to allow any origin
+            app.UseCors("AllowAnyOrigin");
 
             // Enable HTTPS redirection
             app.UseHttpsRedirection();
@@ -276,6 +264,11 @@ namespace BookSearch
             // Map controllers
             app.MapControllers();
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                dbContext.Database.Migrate();  // Ensures migrations are applied
+            }
             // Run the app
             app.Run();
         }
